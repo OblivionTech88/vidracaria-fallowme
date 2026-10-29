@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { LayoutDashboard, List, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
+import { SettingsDialog } from "@/components/SettingsDialog";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -37,6 +38,7 @@ function Layout() {
             <Link to="/entradas" className={link} activeProps={{ className: "bg-secondary text-foreground" }}>
               <List className="size-4" /> <span className="hidden sm:inline">Entradas</span>
             </Link>
+            <SettingsDialog />
             <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sair">
               <LogOut />
             </Button>
