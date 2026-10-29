@@ -138,18 +138,18 @@ const markup = (o) => `<div class="fpb-c canvas">
       </div>
       <div class="grid" id="grid">
         <!-- net worth -->
-        <section class="card h1" id="nw" aria-label="Receitas acumuladas"></section>
+        <section class="card h1" id="nw" aria-label="Entradas por período"></section>
         <!-- allocation -->
         <section class="card h1" id="alloc" aria-label="Distribuição por clientes"></section>
         <!-- KPI row -->
-        <section class="card h2 kpi" id="ret" aria-label="Variação dos recebimentos"></section>
-        <section class="card glass h2 kpi" id="cash" aria-label="Recebimentos em caixa"></section>
+        <section class="card h2 kpi" id="ret" aria-label="Portfolio return"></section>
+        <section class="card glass h2 kpi" id="cash" aria-label="Free cash"></section>
         <section class="card glass h2 kpi" id="pay" aria-label="Upcoming payments"></section>
-        <section class="card glass h2 kpi" id="goals" aria-label="Metas de entradas"></section>
+        <section class="card glass h2 kpi" id="goals" aria-label="Goals"></section>
         <!-- bottom row -->
-        <section class="card h3" id="flow" aria-label="Fluxo de entradas"></section>
-        <section class="card h3" id="crypto" aria-label="Obras em destaque"></section>
-        <section class="card h3" id="stocks" aria-label="Entradas semanais"></section>
+        <section class="card h3" id="flow" aria-label="Fluxo mensal"></section>
+        <section class="card h3" id="crypto" aria-label="Crypto"></section>
+        <section class="card h3" id="stocks" aria-label="Stocks"></section>
       </div>
     </div>
 ${o.credit?`<div class="vbrow"><a class="vb-badge" href="https://vasnev.art" target="_blank" rel="noopener" aria-label="Made by vasnev.art"><span class="vb-mark" id="vbm" aria-hidden="true"></span><span><span class="vb-by">by</span> vasnev.art</span><svg class="vb-arr" viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>`:""}
@@ -191,12 +191,12 @@ const total=p=>p.fiat+p.stocks+p.crypto;
 /* ---------- helpers ---------- */
 function bg({top,base,bottom,core}){return `<div class="g" style="background:linear-gradient(180deg,${top} 0%,${base} 36%,${base} 74%,${bottom} 100%)"></div><div class="core" style="background:${core}"></div>`}
 const GR={
-  blue:{top:'#a43b4a',base:'#aa1230',bottom:'#5e1024',core:'#19040a'},
+  blue:{top:'#b9a6ff',base:'#2e43ff',bottom:'#6d7dff',core:'#05082a'},
   graph:{top:'#9a9aa8',base:'#3a3a44',bottom:'#55555f',core:'#060608'},
-  pink:{top:'#f29b9f',base:'#9e1432',bottom:'#c5213b',core:'#2e0612'},
+  pink:{top:'#ffb3d6',base:'#ff2a85',bottom:'#ff6aa8',core:'#3a031c'},
   copper:{top:'#f6bf96',base:'#c2683a',bottom:'#dc8a5c',core:'#1d0b05'},
   green:{top:'#a6e8c8',base:'#36956f',bottom:'#58b58c',core:'#061d15'},
-  lime:{top:'#ffb4aa',base:'#cb243e',bottom:'#eb5560',core:'#300611'},
+  lime:{top:'#f4ffb8',base:'#a3c400',bottom:'#c9e03a',core:'#121700'},
 };
 function smoothPath(P,move=true){let d=(move?'M':'L')+`${P[0][0]},${P[0][1]}`;for(let i=0;i<P.length-1;i++){const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||p2,k=.17;
   d+=`C${p1[0]+(p2[0]-p0[0])*k},${p1[1]+(p2[1]-p0[1])*k} ${p2[0]-(p3[0]-p1[0])*k},${p2[1]-(p3[1]-p1[1])*k} ${p2[0]},${p2[1]}`}return d}
@@ -221,11 +221,11 @@ const hideTip=()=>tip.classList.remove('on');
 
 /* ================= cards ================= */
 
-/* ---- Receitas acumuladas: a stream of the three asset classes ---- */
+/* ---- Entradas por período: a stream of the three asset classes ---- */
 const nw=$id('nw');
 nw.innerHTML=`${bg(GR.blue)}<div class="in-c">
-  <div class="row hrow" style="justify-content:space-between"><div class="ttl">Receitas acumuladas</div>
-    <div class="legend"><span><i style="background:${COL.fiat}"></i>Outros clientes</span><span><i style="background:${COL.stocks}"></i>Entradas semanais</span><span><i style="background:${COL.crypto}"></i>Obras em destaque</span></div></div>
+  <div class="row hrow" style="justify-content:space-between"><div class="ttl">Entradas por período</div>
+    <div class="legend"><span><i style="background:${COL.fiat}"></i>Outros</span><span><i style="background:${COL.stocks}"></i>Clientes principais</span><span><i style="background:${COL.crypto}"></i>Obras</span></div></div>
   <div class="row nrow" style="margin-top:16px;align-items:flex-end;gap:16px"><div class="nwn"></div>
     <div style="padding-bottom:6px"><div class="delta nwd"></div><div class="muted nwc" style="margin-top:3px"></div></div></div>
   <svg class="nws" style="position:absolute;left:0;right:0;bottom:0;display:block" aria-hidden="true"></svg></div><div class="rim"></div>`;
@@ -255,14 +255,14 @@ function drawNW(){
   const hit=svg.querySelector('.hit'),hl=svg.querySelector('.hl');
   hit.onpointermove=e=>{const r=svg.getBoundingClientRect(),z=r.width/W,x=(e.clientX-r.left)/z;const i=Math.max(0,Math.min(n-1,Math.round((x+20)/(W+40)*(n-1))));const p=D[i];
     hl.setAttribute('x1',X(i));hl.setAttribute('x2',X(i));hl.setAttribute('opacity',1);
-    showTip(r.left+X(i)*z,r.top+(mid-lay[i].fsc)*z,p.l,[['Obras em destaque',money(p.crypto),COL.crypto],['Entradas semanais',money(p.stocks),COL.stocks],['Outros clientes',money(p.fiat),COL.fiat],['Total',money(total(p))]])};
+    showTip(r.left+X(i)*z,r.top+(mid-lay[i].fsc)*z,p.l,[['Crypto',money(p.crypto),COL.crypto],['Stocks',money(p.stocks),COL.stocks],['Fiat',money(p.fiat),COL.fiat],['Total',money(total(p))]])};
   hit.onpointerleave=()=>{hl.setAttribute('opacity',0);hideTip()};
 }
 function updateNW(){
   nwData=series();const D=nwData,a=total(D[0]),b=total(D[D.length-1]);
   nwNum.count(b);
   nw.querySelector('.nwd').textContent=(b>=a?'↑ ':'↓ ')+(a?Math.abs((b-a)/a*100):0).toFixed(1)+'%';
-  nw.querySelector('.nwc').textContent=(b>=a?'+':'−')+money(Math.abs(b-a))+' '+({'1M':'no mês','3M':'em 3 meses','1Y':'no ano','All':'no período'})[S.period];
+  nw.querySelector('.nwc').textContent=(b>=a?'+':'−')+money(Math.abs(b-a))+' '+({'1M':'this month','3M':'in 3 months','1Y':'this year','All':'in 3 years'})[S.period];
   cancelAnimationFrame(nwRaf);const t0=performance.now();nwGrow=0;
   const f=now=>{nwGrow=reduce?1:Math.min(1,(now-t0)/1100);drawNW();if(nwGrow<1)nwRaf=RAF(f)};nwRaf=RAF(f);
 }
@@ -270,7 +270,7 @@ function updateNW(){
 /* ---- Distribuição por clientes: a half gauge of tick marks ---- */
 const al=$id('alloc');
 al.innerHTML=`${bg(GR.graph)}<div class="in-c">
-  <div class="row" style="justify-content:space-between"><div class="ttl">Distribuição por clientes</div><span class="chip" style="background:rgba(255,255,255,.12)">Clientes / Obras</span></div>
+  <div class="row" style="justify-content:space-between"><div class="ttl">Distribuição por clientes</div><span class="chip" style="background:rgba(255,255,255,.12)">Distribuição</span></div>
   <svg class="alg" width="300" height="168" viewBox="-150 -150 300 168" style="position:absolute;left:50%;margin-left:-150px;top:70px" aria-hidden="true"></svg>
   <div class="all" style="position:absolute;left:24px;right:24px;bottom:20px"></div></div><div class="rim"></div>`;
 function updateAlloc(){
@@ -278,54 +278,54 @@ function updateAlloc(){
   const n=56,svg=al.querySelector('.alg');let s='';
   for(let i=0;i<=n;i++){const f=i/n,a=180+f*180,cls=f<=fr.stocks?'stocks':f<=fr.stocks+fr.crypto?'crypto':'fiat';const [x1,y1]=P2(136,a),[x2,y2]=P2(i%7===0?112:118,a);
     s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${COL[cls]}" stroke-opacity="${cls==='fiat'?.35:1}" stroke-width="3.2" stroke-linecap="round" style="opacity:0;animation:tk .4s ${i*12}ms forwards"/>`}
-  const inv=Math.round((fr.stocks+fr.crypto)*100)||0;
-  s+=`<text y="-22" text-anchor="middle" font-family="Geist" font-weight="200" font-size="52" fill="#fff" letter-spacing="-2">${inv}<tspan font-size="17" dy="-24" fill="${T2}">%</tspan></text><text y="0" text-anchor="middle" font-size="12" font-weight="500" fill="${T3}" font-family="Geist">concentrado</text>`;
+  const inv=Math.round((fr.stocks+fr.crypto)*100);
+  s+=`<text y="-22" text-anchor="middle" font-family="Geist" font-weight="200" font-size="52" fill="#fff" letter-spacing="-2">${inv}<tspan font-size="17" dy="-24" fill="${T2}">%</tspan></text><text y="0" text-anchor="middle" font-size="12" font-weight="500" fill="${T3}" font-family="Geist">dos recebimentos</text>`;
   svg.innerHTML=`<style>@keyframes tk{to{opacity:1}}</style>`+s;
-  al.querySelector('.all').innerHTML=[['Entradas semanais',fr.stocks,p.stocks,'stocks'],['Obras em destaque',fr.crypto,p.crypto,'crypto'],['Outros clientes',fr.fiat,p.fiat,'fiat']].map(([k,f,v,c],i)=>
+  al.querySelector('.all').innerHTML=[['Stocks',fr.stocks,p.stocks,'stocks'],['Crypto',fr.crypto,p.crypto,'crypto'],['Fiat',fr.fiat,p.fiat,'fiat']].map(([k,f,v,c],i)=>
     `<div class="row" style="height:30px;${i?'border-top:1px solid rgba(255,255,255,.1)':''}"><i style="width:8px;height:8px;border-radius:50%;background:${COL[c]}"></i><span style="flex:1;font-size:13px;font-weight:600">${k}</span><span class="mono muted" style="width:44px;text-align:right">${Math.round(f*100)}%</span><span class="mono" style="width:76px;text-align:right;font-size:13px">${money(v)}</span></div>`).join('');
 }
 
 /* ---- KPI: return (solid accent tile) ---- */
 const ret=$id('ret');
-ret.innerHTML=`${bg(GR.lime)}<div class="in-c"><div class="row" style="justify-content:space-between"><div class="cap">Variação dos recebimentos</div><span class="chip rtc">+$0</span></div>
+ret.innerHTML=`${bg(GR.lime)}<div class="in-c"><div class="row" style="justify-content:space-between"><div class="cap">Portfolio return</div><span class="chip rtc">+$0</span></div>
   <div style="position:absolute;left:22px;bottom:32px;display:flex;align-items:center;gap:8px"><svg width="30" height="36" viewBox="0 0 34 40" aria-hidden="true"><path d="M17 37V5M5 17L17 5l12 12" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="big rtv" style="font-size:52px">0%</span></div>
   <div class="muted rtp" style="position:absolute;left:24px;bottom:14px;font-size:11.5px"></div></div><div class="rim"></div>`;
 function updateRet(){const D=nwData,inv0=D[0].stocks+D[0].crypto,inv1=D[D.length-1].stocks+D[D.length-1].crypto,r=inv0?(inv1-inv0)/inv0*100:0;
   tween(ret.querySelector('.rtv'),r,v=>v.toFixed(1)+'%');ret.querySelector('.rtc').textContent='+'+money(inv1-inv0,{compact:true});
-  ret.querySelector('.rtp').textContent='Entradas semanais + crypto · '+({'1M':'mês anterior','3M':'últimos 3 meses','1Y':'últimos 12 meses','All':'período completo'})[S.period]}
+  ret.querySelector('.rtp').textContent='Stocks + crypto · '+({'1M':'last month','3M':'last 3 months','1Y':'last 12 months','All':'last 3 years'})[S.period]}
 
 /* ---- KPI: free cash with runway ticks ---- */
 const cash=$id('cash');
-cash.innerHTML=`<div class="in-c"><div class="row" style="justify-content:space-between"><div class="cap">Recebimentos em caixa</div><span class="muted">Média</span></div>
+cash.innerHTML=`<div class="in-c"><div class="row" style="justify-content:space-between"><div class="cap">Free cash</div><span class="muted">Runway</span></div>
   <div class="row" style="margin-top:14px;align-items:baseline;justify-content:space-between"><span class="big csv" style="font-size:38px">0</span><span class="mono" style="font-size:20px;font-weight:500"><span class="crw">0</span><span class="muted" style="font-size:12px"> mo</span></span></div>
   <svg class="cst" width="100%" height="22" style="position:absolute;left:24px;right:24px;bottom:22px;width:calc(100% - 48px)" aria-hidden="true"></svg></div>`;
 function updateCash(){const v=nwData[nwData.length-1].fiat*.42,mo=v/2100;tween(cash.querySelector('.csv'),v,x=>money(x));tween(cash.querySelector('.crw'),mo,x=>x.toFixed(1));
   const svg=cash.querySelector('.cst'),W=svg.getBoundingClientRect().width||220,n=36;let s='';
   for(let i=0;i<n;i++){const x=1+i*(W-2)/(n-1),on=i/(n-1)<=mo/12;s+=`<line x1="${x}" x2="${x}" y1="${i%6===0?2:8}" y2="20" stroke="${on?ACC:'rgba(255,255,255,.28)'}" stroke-width="1.6" stroke-linecap="round" style="transition:stroke .2s ${i*14}ms"/>`}
-  svg.innerHTML=s+`<text x="${W}" y="0" dy="-4" text-anchor="end" font-size="10" fill="${T3}" font-family="Geist Mono">12 meses</text>`}
+  svg.innerHTML=s+`<text x="${W}" y="0" dy="-4" text-anchor="end" font-size="10" fill="${T3}" font-family="Geist Mono">12 mo</text>`}
 
 /* ---- KPI: upcoming payments ---- */
 const pay=$id('pay');
 const PAY=data.payments.map(p=>[p.name,p.date,p.amount,p.name.charAt(0)]);
-function updatePay(){pay.innerHTML=`<div class="in-c" style="padding-bottom:14px"><div class="row" style="justify-content:space-between"><div class="cap">Últimas entradas</div><span class="mono muted">${money(PAY.reduce((a,p)=>a+p[2],0))}</span></div>
+function updatePay(){pay.innerHTML=`<div class="in-c" style="padding-bottom:14px"><div class="row" style="justify-content:space-between"><div class="cap">Next payments</div><span class="mono muted">${money(PAY.reduce((a,p)=>a+p[2],0))}</span></div>
   <div style="margin-top:10px">${PAY.map(([n,d,v,l],i)=>`<div class="row" style="height:34px;${i?'border-top:1px solid rgba(255,255,255,.08)':''}"><i style="width:24px;height:24px;border-radius:8px;background:rgba(255,255,255,.1);display:grid;place-items:center;font:600 11px Geist;font-style:normal">${l}</i><span style="flex:1;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n}</span><span class="muted mono" style="font-size:11.5px">${d}</span><span class="mono" style="width:62px;text-align:right;font-size:13px">${money(v)}</span></div>`).join('')}</div></div>`}
 
 /* ---- KPI: goals ---- */
 const goals=$id('goals');
 const GO=data.goals.map(g=>[g.name,g.progress,g.target]);
-function updateMetas de entradas(){goals.innerHTML=`<div class="in-c"><div class="row" style="justify-content:space-between"><div class="cap">Metas de entradas</div><span class="muted">2 active</span></div>
+function updateGoals(){goals.innerHTML=`<div class="in-c"><div class="row" style="justify-content:space-between"><div class="cap">Goals</div><span class="muted">2 active</span></div>
   ${GO.map(([n,f,v],k)=>`<div style="margin-top:${k?14:16}px"><div class="row" style="justify-content:space-between;font-size:13px;font-weight:600"><span>${n}</span><span class="mono" style="font-weight:500">${Math.round(f*100)}%<span class="muted"> of ${money(v,{compact:true})}</span></span></div>
     <svg width="100%" height="12" style="margin-top:8px;display:block" class="gl" data-f="${f}" aria-hidden="true"></svg></div>`).join('')}</div>`;
   RAF(()=>goals.querySelectorAll('.gl').forEach((svg,k)=>{const W=svg.getBoundingClientRect().width,n=40,f=+svg.dataset.f;let s='';
     for(let i=0;i<n;i++){const x=1+i*(W-2)/(n-1),on=i/(n-1)<=f;s+=`<line x1="${x}" x2="${x}" y1="${i%8===0?0:4}" y2="12" stroke="${on?ACC:'rgba(255,255,255,.28)'}" stroke-width="1.6" stroke-linecap="round" style="opacity:0;animation:tk2 .3s ${300+k*150+i*12}ms forwards"/>`}
     svg.innerHTML='<style>@keyframes tk2{to{opacity:1}}</style>'+s}))}
 
-/* ---- Fluxo de entradas: mirrored waves, income above, spending below ---- */
+/* ---- Fluxo mensal: mirrored waves, income above, spending below ---- */
 const flow=$id('flow');
 flow.innerHTML=`${bg(GR.pink)}<div class="in-c">
-  <div class="row" style="justify-content:space-between"><div><div class="ttl">Fluxo de entradas</div><div class="muted" style="margin-top:4px">Net <span class="mono" style="color:${ACC}">+$3,240</span> por mês</div></div>
-    <div class="legend" style="flex-direction:column;gap:4px;align-items:flex-end"><span><i style="background:#fff"></i>Entradas</span><span><i style="background:#FFD0E6"></i>Comparativo</span></div></div>
+  <div class="row" style="justify-content:space-between"><div><div class="ttl">Fluxo mensal</div><div class="muted" style="margin-top:4px">Net <span class="mono" style="color:${ACC}">+$3,240</span> a month</div></div>
+    <div class="legend" style="flex-direction:column;gap:4px;align-items:flex-end"><span><i style="background:#fff"></i>Income</span><span><i style="background:#FFD0E6"></i>Spending</span></div></div>
   <svg class="fls" style="position:absolute;left:0;bottom:12px" aria-hidden="true"></svg></div><div class="rim"></div>`;
 const MLAB=data.cashflow.months;
 const INC=data.cashflow.income;
@@ -351,28 +351,28 @@ function updateFlow(instant){
     const hit=svg.querySelector('.hit'),hl=svg.querySelector('.hl');
     hit.onpointermove=e=>{const r=svg.getBoundingClientRect(),z=r.width/W,x=(e.clientX-r.left)/z,i=Math.max(0,Math.min(5,Math.round((x-L)/(R-L)*5)));
       hl.setAttribute('x1',X(i));hl.setAttribute('x2',X(i));hl.setAttribute('opacity',1);
-      showTip(r.left+X(i)*z,r.top+(mid-lab-INC[0][i]/max*amp)*z,MLAB[i]+' 2026',[['Entradas',money(INC[0][i]*1000),'#fff'],['Comparativo',money(SPN[0][i]*1000),'#FFD0E6'],['Diferença',money((INC[0][i]-SPN[0][i])*1000)]])};
+      showTip(r.left+X(i)*z,r.top+(mid-lab-INC[0][i]/max*amp)*z,MLAB[i]+' 2026',[['Income',money(INC[0][i]*1000),'#fff'],['Spending',money(SPN[0][i]*1000),'#FFD0E6'],['Saved',money((INC[0][i]-SPN[0][i])*1000)]])};
     hit.onpointerleave=()=>{hl.setAttribute('opacity',0);hideTip()};
     if(g<1)flowRaf=RAF(frame)};
   flowRaf=RAF(frame);
 }
 
-/* ---- Obras em destaque: a coin rising, assets with sparklines ---- */
+/* ---- Crypto: a coin rising, assets with sparklines ---- */
 const cr=$id('crypto');
 const CA=data.crypto.map(a=>[a.name,a.symbol,a.share,'',[]]);
-cr.innerHTML=`${bg(GR.copper)}<div class="in-c"><div class="row" style="justify-content:space-between"><div class="ttl">Obras em destaque</div><span class="muted">7 dias</span></div>
+cr.innerHTML=`${bg(GR.copper)}<div class="in-c"><div class="row" style="justify-content:space-between"><div class="ttl">Obras em destaque</div><span class="muted">7 days</span></div>
   <div class="row" style="margin-top:14px;align-items:flex-end;justify-content:space-between"><span class="big crv">0</span><span style="padding-bottom:4px"><span class="delta crd"></span><span class="muted"> 24h</span></span></div>
   <div class="crb" style="margin-top:16px"></div>
   <div class="crl" style="position:absolute;left:24px;right:24px;bottom:14px"></div></div><div class="rim"></div>`;
 /* 7-day close line with a soft wash; each asset keeps its own shape */
 const OHLC=Object.fromEntries(data.crypto.map(a=>[a.symbol,a.ohlc]));
-function candles(t){const d=(OHLC[t]||[]).map(x=>x[3]),W=96,H=30,lo=Math.min(...d),hi=Math.max(...d),pad=(hi-lo)*.15||1,Y=v=>H-3-(v-lo+pad)/(hi-lo+2*pad)*(H-6);
+function candles(t){const d=OHLC[t].map(x=>x[3]),W=96,H=30,lo=Math.min(...d),hi=Math.max(...d),pad=(hi-lo)*.15||1,Y=v=>H-3-(v-lo+pad)/(hi-lo+2*pad)*(H-6);
   const P=d.map((v,i)=>[2+i/(d.length-1)*(W-6),Y(v)]),e=P[P.length-1],up=d[d.length-1]>=d[0],gid='sg'+t;
   return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true"><defs><linearGradient id="${gid}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
     <path d="${smoothPath(P)}L${e[0]},${H}L${P[0][0]},${H}Z" fill="url(#${gid})"/><path d="${smoothPath(P)}" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="${e[0]}" cy="${e[1]}" r="3" fill="${up?ACC:'#fff'}" stroke="rgba(0,0,0,.35)" stroke-width="1"/></svg>`}
 const CHG=data.crypto.map(a=>a.change);
-function updateObras em destaque(){const v=nwData[nwData.length-1].crypto;tween(cr.querySelector('.crv'),v,x=>money(x));cr.querySelector('.crd').textContent='↑ 2.4%';
+function updateCrypto(){const v=nwData[nwData.length-1].crypto;tween(cr.querySelector('.crv'),v,x=>money(x));cr.querySelector('.crd').textContent='↑ 2.4%';
   /* one thin segmented bar shows the split; tones of white, no colour dots */
   cr.querySelector('.crb').innerHTML=`<div style="display:flex;gap:3px;height:6px">${CA.map(([n,s,f],i)=>`<div style="flex:0 0 calc(${f*100}% - 2px);border-radius:3px;background:rgba(255,255,255,${[.95,.6,.32][i]});transform-origin:left;transform:scaleX(0);transition:transform .8s var(--ease) ${.1+i*.1}s" class="crs"></div>`).join('')}</div>
     <div style="display:flex;gap:3px;margin-top:7px">${CA.map(([n,s,f])=>`<span class="mono muted" style="flex:0 0 calc(${f*100}% - 2px);font-size:11px;white-space:nowrap">${s} ${Math.round(f*100)}%</span>`).join('')}</div>`;
@@ -381,13 +381,13 @@ function updateObras em destaque(){const v=nwData[nwData.length-1].crypto;tween(
     <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600">${n}</div><div class="mono muted" style="font-size:11px">${s} · 7d</div></div>${candles(s)}
     <div style="width:80px;text-align:right"><div class="mono" style="font-size:13px">${money(v*f)}</div><div class="mono" style="font-size:11px;color:${CHG[i].startsWith('+')?ACC:T3}">${CHG[i]}</div></div></div>`).join('')}
 
-/* ---- Entradas semanais: capsule columns per weekday ---- */
+/* ---- Stocks: capsule columns per weekday ---- */
 const st=$id('stocks');
 const WK=data.stocks.days,WV=data.stocks.values;
-st.innerHTML=`${bg(GR.green)}<div class="in-c"><div class="ttl">Entradas semanais</div>
-  <div style="margin-top:14px"><span class="big stv" style="font-size:34px">0</span></div><div class="row" style="margin-top:6px;gap:8px"><span class="delta">↑ 1.8%</span><span class="muted">na semana</span></div>
+st.innerHTML=`${bg(GR.green)}<div class="in-c"><div class="ttl">Receitas da semana</div>
+  <div style="margin-top:14px"><span class="big stv" style="font-size:34px">0</span></div><div class="row" style="margin-top:6px;gap:8px"><span class="delta">↑ 1.8%</span><span class="muted">this week</span></div>
   <svg class="sts" style="position:absolute;left:18px;bottom:14px" aria-hidden="true"></svg></div><div class="rim"></div>`;
-function updateEntradas semanais(instant){const v=nwData[nwData.length-1].stocks;if(!instant)tween(st.querySelector('.stv'),v,x=>money(x));
+function updateStocks(instant){const v=nwData[nwData.length-1].stocks;if(!instant)tween(st.querySelector('.stv'),v,x=>money(x));
   const svg=st.querySelector('.sts'),W=st.clientWidth-36,Hh=160,pb=18,bw=22,max=5,gap=(W-24-bw*5)/4;svg.setAttribute('width',W);svg.setAttribute('height',Hh);
   const Y=x=>(Hh-pb)*(1-x/max);let s='';
   [0,2,4].forEach(t=>s+=`<text x="0" y="${Y(t)+3.5}" font-size="9.5" fill="${T3}" font-family="Geist Mono">${t}K</text>`);
@@ -406,9 +406,10 @@ function seg(host,items,key){host.innerHTML=items.map(k=>`<button type="button" 
   host.querySelectorAll('button').forEach(b=>b.onclick=()=>{S[key]=b.textContent;host.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));updateAll()})}
 seg($id('period'),['1M','3M','1Y','All'],'period');
 seg($id('ccy'),['BRL'],'ccy');
-function updateAll(){updateNW();updateAlloc();updateRet();updateCash();updatePay();updateMetas de entradas();updateFlow();updateObras em destaque();updateEntradas semanais()}
+function updateKpis(){ [['ret','Entradas de hoje',data.kpis.today],['cash','Entradas da semana',data.kpis.week],['pay','Entradas do mês',data.kpis.month],['goals','Entradas do ano',data.kpis.year]].forEach(([id,label,value])=>{$id(id).innerHTML='<div class="in-c"><div class="cap">'+label+'</div><div class="big" style="font-size:clamp(20px,2vw,38px);margin-top:25px;font-weight:500">'+money(Number(value),{dec:2})+'</div></div><div class="rim"></div>'})}
+function updateAll(){updateNW();updateAlloc();updateKpis();updateFlow();updateCrypto();updateStocks()}
 
-let rz;const ro=new ResizeObserver(()=>{clearTimeout(rz);rz=setTimeout(()=>{if(!nwData)return;cancelAnimationFrame(nwRaf);nwGrow=1;drawNW();updateFlow(true);updateEntradas semanais(true);updateCash();updateMetas de entradas()},120)});
+let rz;const ro=new ResizeObserver(()=>{clearTimeout(rz);rz=setTimeout(()=>{if(!nwData)return;cancelAnimationFrame(nwRaf);nwGrow=1;drawNW();updateFlow(true);updateStocks(true);updateKpis()},120)});
 ['nw','flow','stocks','cash'].forEach(id=>ro.observe($id(id)));
 const vbm=$id('vbm');const ON=new Set(['0,0','4,0','1,1','3,1','2,2']);
 if(vbm)for(let i=0;i<15;i++){const x=i%5,y=Math.floor(i/5),e=document.createElement('i');if(ON.has(x+','+y))e.className='on';e.style.setProperty('--x',x);vbm.appendChild(e)}
