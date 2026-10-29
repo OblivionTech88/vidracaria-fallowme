@@ -1,3 +1,2 @@
 # Fallow'me Financeiro
-
-Sistema financeiro da Vidraçaria Fallow'me.
+Projeto React/TypeScript para controle financeiro da Vidraçaria Fallow'me.
