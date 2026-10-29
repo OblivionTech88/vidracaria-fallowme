@@ -14,6 +14,7 @@ import * as React from "react";
 export interface FinanceBentoData {
   /** Month-end balances by asset class, oldest first (24+ months for "All"). */
   history: { date: string; fiat: number; stocks: number; crypto: number }[];
+  kpis: { today: number; week: number; month: number; year: number };
   payments: { name: string; date: string; amount: number }[];
   goals: { name: string; progress: number; target: number }[];
   /** Six months of income and spending, in thousands; first row is the latest year. */
