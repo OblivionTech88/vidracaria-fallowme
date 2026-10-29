@@ -17,10 +17,10 @@ export function FinanceBento({entradas}:{entradas:Entrada[]}) {
      row[key]+=Number(e.valor);byMonth.set(k,row);
    }
    const totals={fiat:0,stocks:0,crypto:0};
-   const initial= new Date(Date.UTC(y,m-36,1)).toISOString().slice(0,7);
+   const initial= new Date(Date.UTC(y,m-35,1)).toISOString().slice(0,7);
    for(const [k,r] of byMonth) if(k<initial) {totals.fiat+=r.fiat;totals.stocks+=r.stocks;totals.crypto+=r.crypto;}
    const history=Array.from({length:36},(_,i)=>{
-     const date=new Date(Date.UTC(y,m-36+i,28));
+     const date=new Date(Date.UTC(y,m-35+i,28));
      const key=date.toISOString().slice(0,7),r=byMonth.get(key);
      if(r){totals.fiat+=r.fiat;totals.stocks+=r.stocks;totals.crypto+=r.crypto;}
      return {date:date.toISOString(),...totals};
